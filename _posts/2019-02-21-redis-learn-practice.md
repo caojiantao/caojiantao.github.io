@@ -24,7 +24,7 @@ Redis 是一个开源的使用 ANSI C 语言编写、遵守 BSD 协议、支持�
 redis-server.exe redis.windows.conf
 ```
 
-![image.png](https://shop.io.mi-img.com/app/shop/img?id=shop_6f25ecff9507133f15a925a7f8f0e314.png)
+![](https://shop.io.mi-img.com/app/shop/img?id=shop_6f25ecff9507133f15a925a7f8f0e314.png)
 
 ### 2.2 Linux
 
@@ -44,7 +44,7 @@ cd src
 ./redis-server ../redis.conf
 ```
 
-![image.png](https://shop.io.mi-img.com/app/shop/img?id=shop_7ff7dfa4ede92433f302d832073d8d37.png)
+![](https://shop.io.mi-img.com/app/shop/img?id=shop_7ff7dfa4ede92433f302d832073d8d37.png)
 
 
 ## 3 配置
@@ -363,11 +363,11 @@ QUEUED
 
 Redis 支持一个发布订阅的消息通信模式，发送者 pub 发送消息，订阅者 sub 接受消息，可订阅任意数量的频道 channel；
 
-![image.png](https://shop.io.mi-img.com/app/shop/img?id=shop_6266baee57162c51a3d3ec7386dac7c3.png)
+![](https://shop.io.mi-img.com/app/shop/img?id=shop_6266baee57162c51a3d3ec7386dac7c3.png)
 
 三个客户端都订阅了 channel 这个频道；
 
-![image.png](https://shop.io.mi-img.com/app/shop/img?id=shop_b2748d97cfe4de42ca3e01774e8c1278.png)
+![](https://shop.io.mi-img.com/app/shop/img?id=shop_b2748d97cfe4de42ca3e01774e8c1278.png)
 
 一旦有消息发布pub到channel中，之前订阅该channel的三个客户端都会收到这个message；
 
@@ -843,7 +843,7 @@ public class TestController {
 
 第一次请求查询Student时；
 
-![image.png](https://shop.io.mi-img.com/app/shop/img?id=shop_7e51d5c9330be34a138ac59a674b85e6.png)
+![](https://shop.io.mi-img.com/app/shop/img?id=shop_7e51d5c9330be34a138ac59a674b85e6.png)
 
 重复该请求发现控制台并不会打印日志，查看 Redis 该记录已缓存；
 
@@ -864,7 +864,7 @@ public class TestController {
 
 **主从模式**很好的解决了以上问题。一个 Redis 实例作为主机 master，其他的作为从机 slave，主机主要用于数据的写入，从机则主要提供数据的读取。从机在启动时会同步全量主机数据，主机也会在写入数据的时候同步到所有的从机。
 
-![image.png](https://shop.io.mi-img.com/app/shop/img?id=shop_53f3b4bfe14b793412468c9ddadd0a59.png)
+![](https://shop.io.mi-img.com/app/shop/img?id=shop_53f3b4bfe14b793412468c9ddadd0a59.png)
 
 有两种方式可以设置主从关系；
 
@@ -961,7 +961,7 @@ OK
 
 Sentinel（哨兵）作为一个单独的服务，用来监控 master 主机，间接监控所有 slave 从机，如下图所示；
 
-![image.png](https://shop.io.mi-img.com/app/shop/img?id=shop_9901d2076caa9d0bb3b3dc70d1fdfa68.png)
+![](https://shop.io.mi-img.com/app/shop/img?id=shop_9901d2076caa9d0bb3b3dc70d1fdfa68.png)
 
 sentinel 主要有以下三个特点；
 
