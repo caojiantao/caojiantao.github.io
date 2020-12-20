@@ -1,11 +1,6 @@
 ---
 layout: post
 title: Redis 入门到实战
-date: 2019-02-21 15:19
-tags:
-categories:
- - 编程
-thumb: https://img13.360buyimg.com/img/jfs/t1/47835/5/12521/12053/5d942142Eca9cfb88/e2570efc7e01cd76.jpg
 ---
 ## 1 简介
 
@@ -17,9 +12,9 @@ Redis 是一个开源的使用 ANSI C 语言编写、遵守 BSD 协议、支持�
 
 ## 2 安装
 
-官网地址： https://redis.io
+官网地址： [https://redis.io](https://redis.io)
 
-下载地址： https://github.com/antirez/redis/releases 
+下载地址： [https://github.com/antirez/redis/releases](https://github.com/antirez/redis/releases)
 
 ### 2.1 Windows
 
@@ -29,7 +24,7 @@ Redis 是一个开源的使用 ANSI C 语言编写、遵守 BSD 协议、支持�
 redis-server.exe redis.windows.conf
 ```
 
-![](http://pic.caojiantao.site/1935847-30a3bb73640fedf9.webp)
+![image.png](https://shop.io.mi-img.com/app/shop/img?id=shop_6f25ecff9507133f15a925a7f8f0e314.png)
 
 ### 2.2 Linux
 
@@ -49,7 +44,7 @@ cd src
 ./redis-server ../redis.conf
 ```
 
-![](http://pic.caojiantao.site/1935847-1e7b232e80a7f3fd.webp)
+![image.png](https://shop.io.mi-img.com/app/shop/img?id=shop_7ff7dfa4ede92433f302d832073d8d37.png)
 
 
 ## 3 配置
@@ -328,7 +323,7 @@ geo 为地理位置类型，3.2+ 版本才开始支持，其底层实现仍是 z
 | Hash(字典)           | 键值对集合,即编程语言中的Map类型                       | 适合存储对象,并且可以像数据库中update一个属性一样只修改某一项属性值(Memcached中需要取出整个字符串反序列化成对象修改完再序列化存回去) | 存储、读取、修改用户属性                                     |
 | List(列表)           | 链表(双向链表)                                         | 增删快,提供了操作某一段元素的API                             | 1,最新消息排行等功能(比如朋友圈的时间线) 2,消息队列          |
 | Set(集合)            | 哈希表实现,元素不重复                                  | 1、添加、删除,查找的复杂度都是O(1) 2、为集合提供了求交集、并集、差集等操作 | 1、共同好友 2、利用唯一性,统计访问网站的所有独立ip 3、好友推荐时,根据tag求交集,大于某个阈值就可以推荐 |
-| Sorted Set(有序集合) | 将Set中的元素增加一个权重参数score,元素按score有序排列 | 数据插入集合时,已经进行天然排序                              | 1、排行榜 2                                                  |
+| Sorted Set(有序集合) | 将Set中的元素增加一个权重参数score,元素按score有序排列 | 数据插入集合时,已经进行天然排序                              | 1、排行榜                                                    |
 
 ## 5 特性
 
@@ -368,11 +363,11 @@ QUEUED
 
 Redis 支持一个发布订阅的消息通信模式，发送者 pub 发送消息，订阅者 sub 接受消息，可订阅任意数量的频道 channel；
 
-![](http://pic.caojiantao.site/1935847-8f242250157aec20.webp)
+![image.png](https://shop.io.mi-img.com/app/shop/img?id=shop_6266baee57162c51a3d3ec7386dac7c3.png)
 
 三个客户端都订阅了 channel 这个频道；
 
-![](http://pic.caojiantao.site/1935847-535723cc770ec46f.webp)
+![image.png](https://shop.io.mi-img.com/app/shop/img?id=shop_b2748d97cfe4de42ca3e01774e8c1278.png)
 
 一旦有消息发布pub到channel中，之前订阅该channel的三个客户端都会收到这个message；
 
@@ -478,7 +473,7 @@ redis-cli.exe --eval test.lua "key1" "key2" , "argv1"
 
 #### 8.1.1 Jedis
 
-github:  https://github.com/xetorthio/jedis 
+github:  [https://github.com/xetorthio/jedis](https://github.com/xetorthio/jedis)
 
 阻塞 I/O 模型，调用方法都是同步的，不支持异步调用，并且 Jedis 客户端非线程安全，需要结合连接池使用；
 
@@ -521,7 +516,7 @@ System.out.println(b);
 
 #### 8.1.2 Lettuce
 
-github: https://github.com/lettuce-io/lettuce-core
+github: [https://github.com/lettuce-io/lettuce-core](https://github.com/lettuce-io/lettuce-core)
 
 基于 Netty 框架，异步调用，线程安全；
 
@@ -557,7 +552,7 @@ connect.close();
 
 #### 8.1.3 Redission
 
-github: https://github.com/redisson/redisson 
+github: [https://github.com/redisson/redisson](https://github.com/redisson/redisson)
 
 实现了分布式和可扩展的 Java 数据结构；
 
@@ -848,7 +843,7 @@ public class TestController {
 
 第一次请求查询Student时；
 
-![](http://pic.caojiantao.site/1935847-534614c197ef974d.webp)
+![image.png](https://shop.io.mi-img.com/app/shop/img?id=shop_7e51d5c9330be34a138ac59a674b85e6.png)
 
 重复该请求发现控制台并不会打印日志，查看 Redis 该记录已缓存；
 
@@ -869,7 +864,7 @@ public class TestController {
 
 **主从模式**很好的解决了以上问题。一个 Redis 实例作为主机 master，其他的作为从机 slave，主机主要用于数据的写入，从机则主要提供数据的读取。从机在启动时会同步全量主机数据，主机也会在写入数据的时候同步到所有的从机。
 
-![](http://pic.caojiantao.site/1935847-74708600fafd2281.webp)
+![image.png](https://shop.io.mi-img.com/app/shop/img?id=shop_53f3b4bfe14b793412468c9ddadd0a59.png)
 
 有两种方式可以设置主从关系；
 
@@ -966,7 +961,7 @@ OK
 
 Sentinel（哨兵）作为一个单独的服务，用来监控 master 主机，间接监控所有 slave 从机，如下图所示；
 
-![](http://pic.caojiantao.site/1935847-f850bb4cc33d821a.webp)
+![image.png](https://shop.io.mi-img.com/app/shop/img?id=shop_9901d2076caa9d0bb3b3dc70d1fdfa68.png)
 
 sentinel 主要有以下三个特点；
 
@@ -981,7 +976,7 @@ sentinel 主要有以下三个特点；
 
 数据存储在 16384 个 slot（插槽）中，所有的数据都是根据一定算法映射到某个 slot 中；
 
-![](http://pic.caojiantao.site/1935847-a156da66645d349b.webp)
+
 
 > 为什么是 16384： https://github.com/antirez/redis/issues/2576 
 
@@ -1227,7 +1222,7 @@ public boolean releaseLock(String lockKey, String requestId) {
 注意解锁姿势，保证操作原子性。
 
 当锁的持有时间无法估算，存在锁超时导致被自动释放掉的可能。可以在获取锁成功时，开启一个定时线程询问持有锁状况，若当前仍持有锁状态，则刷新过期时间。
-参考 Redisson 实现：https://github.com/redisson/redisson/blob/master/redisson/src/main/java/org/redisson/RedissonLock.java (renewExpiration)
+参考 Redisson 实现：[https://github.com/redisson/redisson/blob/master/redisson/src/main/java/org/redisson/RedissonLock.java](https://github.com/redisson/redisson/blob/master/redisson/src/main/java/org/redisson/RedissonLock.java) (renewExpiration)
 
 > Redlock 算法： https://redis.io/topics/distlock 
 
@@ -1249,4 +1244,4 @@ public boolean releaseLock(String lockKey, String requestId) {
 
 描述：热点数据失效瞬间，大量对该热点数据的请求直接打到数据库。
 
-方案：设置缓存永不过期，或者引入互斥锁。
+方案：设置缓存永不过期，或者查询引入互斥锁。
