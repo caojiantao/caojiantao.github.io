@@ -1,7 +1,8 @@
 ---
 layout: post
-title: Redis 入门到实战
+title: Redis 入门实践
 ---
+
 ## 1 简介
 
 Redis，REmote DIctionary Server，是一个由 Salvatore Sanfilippo 写的 Key-Value 存储系统。
@@ -104,7 +105,7 @@ Redis监听端口，默认为 6379；
 
 #### 3.3.5 save
 
-save \<seconds\> \<changes\>
+`save <seconds> <changes>`
 
 指定在多长时间内，至少有多少次更新操作，就将数据同步到数据文件，可以多个条件配合使用；
 
@@ -132,7 +133,7 @@ save 60 10000
 
 #### 3.3.8 replicaof
 
-replicaof \<masterip\> \<masterport\>
+`replicaof <masterip> <masterport>`
 
 当在主从复制中，自己作为 slave，设置 master 的 ip 和端口，在该 slave 启动时，会自动从 master 进行数据同步；
 
@@ -198,6 +199,10 @@ replicaof \<masterip\> \<masterport\>
 #
 # maxmemory-policy noeviction
 ```
+
+1. LRU least recently used 最近使用；
+2. LFU least frequently used 最少使用；
+3. noeviction 默认淘汰策略，return an error；
 
 ## 4 数据类型
 
@@ -324,6 +329,7 @@ geo 为地理位置类型，3.2+ 版本才开始支持，其底层实现仍是 z
 | List(列表)           | 链表(双向链表)                                         | 增删快,提供了操作某一段元素的API                             | 1,最新消息排行等功能(比如朋友圈的时间线) 2,消息队列          |
 | Set(集合)            | 哈希表实现,元素不重复                                  | 1、添加、删除,查找的复杂度都是O(1) 2、为集合提供了求交集、并集、差集等操作 | 1、共同好友 2、利用唯一性,统计访问网站的所有独立ip 3、好友推荐时,根据tag求交集,大于某个阈值就可以推荐 |
 | Sorted Set(有序集合) | 将Set中的元素增加一个权重参数score,元素按score有序排列 | 数据插入集合时,已经进行天然排序                              | 1、排行榜                                                    |
+| geo| 经纬度坐标类型                              |                                                    | 附近的人  
 
 ## 5 特性
 
@@ -715,144 +721,6 @@ public class RedisConfig {
 }
 ```
 
-#### 8.2.5 结合 Spring Cache
-
-将 Redis 操作与 Spring Cache 相结合，能够更加简便开发，主要问题是需要构建 RedisCacheManager 这个实例，这里序列化的方式仍可采用上述 protostuff 方案；
-
-参考配置代码；
-
-```java
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.data.redis.cache.RedisCacheConfiguration;
-import org.springframework.data.redis.cache.RedisCacheManager;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.RedisSerializationContext;
-import org.springframework.data.redis.serializer.RedisSerializer;
-import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-@Setter
-@Slf4j
-@Component
-@ConfigurationProperties("redis")
-public class RedisConfig {
-
-    private List<SerializerConfig> serializerConfig;
-
-    @Bean
-    @SuppressWarnings("unchecked")
-    RedisCacheManager cacheManager(RedisConnectionFactory factory) {
-        Map<String, RedisCacheConfiguration> configurationMap = new HashMap<>();
-        if (!CollectionUtils.isEmpty(serializerConfig)) {
-            RedisCacheConfiguration configuration = RedisCacheConfiguration.defaultCacheConfig();
-            ProtoStuffSerializer serializer;
-            for (SerializerConfig config : serializerConfig) {
-                try {
-                    Class<?> clazz = Class.forName(config.getClassType());
-                    serializer = new ProtoStuffSerializer(clazz);
-                    configuration = configuration.serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(serializer));
-                    configurationMap.put(config.getCacheName(), configuration);
-                } catch (ClassNotFoundException e) {
-                    log.error("添加redis缓存序列化映射关系失败：{}", e);
-                }
-            }
-        }
-        return RedisCacheManager.builder(factory)
-                .withInitialCacheConfigurations(configurationMap)
-                .build();
-    }
-}
-```
-
-这里的 SerializerConfig 便是 spring cache 中 cacheName 与序列化对象类型的映射；
-
-```java
-import lombok.Data;
-
-@Data
-public class SerializerConfig {
-
-    private String cacheName;
-    private String classType;
-}
-```
-
-例如需要缓存Student对象；
-
-```java
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
-
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class Student implements Serializable {
-
-    private String no;
-    private String name;
-    private Integer age;
-}
-```
-
-在application.yml中添加如下配置；
-
-```yml
-redis:
-  serializerConfig:
-    - cacheName: students
-      classType: cn.caojiantao.tutorails.redis.Student
-```
-
-那么springboot初始化便会创建好students这个redis类型的缓存；
-
-编写测试controller测试；
-
-```java
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-@RestController
-public class TestController {
-
-    @RequestMapping("/student")
-    @Cacheable(cacheNames = "students")
-    public Student student(String no) {
-        System.out.println("请求查询数据：" + no);
-        return new Student(no, "hahahah", 18);
-    }
-
-    @RequestMapping("/delete")
-    @CacheEvict(cacheNames = "students")
-    public void flushAll(String no) {
-    }
-}
-```
-
-第一次请求查询Student时；
-
-![](https://shop.io.mi-img.com/app/shop/img?id=shop_7e51d5c9330be34a138ac59a674b85e6.png)
-
-重复该请求发现控制台并不会打印日志，查看 Redis 该记录已缓存；
-
-请求 no 对应的 delete 请求，查看 Redis 该记录已清除，控制台打印日志；
-
-更改请求 no 参数，控制台继续打印日志，查看 Redis 该记录已缓存；
-
-至此 Redis 结合 Spring Cache 完成。
-
 ## 9 分布式解决方案
 
 ### 9.1 主从同步
@@ -1221,10 +1089,25 @@ public boolean releaseLock(String lockKey, String requestId) {
 
 注意解锁姿势，保证操作原子性。
 
+#### 9.4.1 锁超时
+
 当锁的持有时间无法估算，存在锁超时导致被自动释放掉的可能。可以在获取锁成功时，开启一个定时线程询问持有锁状况，若当前仍持有锁状态，则刷新过期时间。
+
 参考 Redisson 实现：[https://github.com/redisson/redisson/blob/master/redisson/src/main/java/org/redisson/RedissonLock.java](https://github.com/redisson/redisson/blob/master/redisson/src/main/java/org/redisson/RedissonLock.java) (renewExpiration)
 
-> Redlock 算法： https://redis.io/topics/distlock 
+#### 9.4.2 RedLock
+
+主从复制时，获取锁成功还未同步 slave 时，master 宕机会出现数据不一致情况。
+
+官方提供名为 RedLock 的算法思想：
+
+1. 获取当前时间；
+2. 尝试按顺序在 N 个节点获取锁；
+3. 在大多数节点获取锁成功，则认为成功；
+4. 如果锁获取成功了，锁有效时间就是最初的锁有效时间减去之前获取锁所消耗的时间；
+5. 如果锁获取失败了，将会尝试释放所有节点的锁；
+
+Redlock 算法： [https://redis.io/topics/distlock](https://redis.io/topics/distlock)
 
 ## 10 缓存雪崩、缓存穿透和缓存击穿
 

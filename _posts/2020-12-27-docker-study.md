@@ -3,7 +3,7 @@ layout: post
 title: Docker 入门实践
 ---
 
-## Docker 介绍
+## 1 Docker 介绍
 
 > 参考：[为什么需要Docker？](https://zhuanlan.zhihu.com/p/54512286)
 
@@ -19,7 +19,7 @@ Docker 是一个开源的应用容器引擎，基于 Go 语言并遵从 Apache2.
 
    可以将一整套环境构建为镜像，进行整体部署，避免线上线下开发环境带来的各种问题，同时也极大地提高了部署效率，不再需要重复配置开发环境。
 
-## Docker 架构
+## 2 Docker 架构
 
 Docker 的三个重要概念：
 
@@ -51,29 +51,29 @@ Docker 使用客户端-服务器 (C/S) 架构模式，使用远程 API 来管理
 
    Docker 仓库，一个 Registry 可以包含多个 Repository 仓库。
 
-## Docker 安装
+## 3 Docker 安装
 
-### CentOS
+### 3.1 CentOS
 
-#### 卸载旧版本（如果存在）
+卸载旧版本（如果存在）
 
 ```bash
 yum remove docker docker-common docker-selinux docker-engine
 ```
 
-#### 安装依赖软件包
+安装依赖软件包
 
 ```bash
 yum install -y yum-utils device-mapper-persistent-data lvm2
 ```
 
-#### 设置 yum 源
+设置 yum 源
 
 ```bash
 yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
 ```
 
-#### 安装 Docker
+安装 Docker
 
 ```bash
 yum install -y docker-ce docker-ce-cli containerd.io
@@ -88,19 +88,19 @@ yum -y install containerd.io-1.2.6-3.3.el7.x86_64.rpm
 
 然后重新执行 Docker 安装命令即可。
 
-#### 启动并加入开机启动
+启动并加入开机启动
 
 ```bash
 systemctl start docker && systemctl enable docker
 ```
 
-#### 验证
+验证
 
 ```bash
 docker version
 ```
 
-#### 镜像加速
+镜像加速
 
 运行 bash 命令；
 
@@ -114,7 +114,7 @@ curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://f1361db2
 systemctl daemon-reload && systemctl restart docker
 ```
 
-#### 远程访问
+远程访问
 
 修改 docker 服务脚本：
 
@@ -140,7 +140,7 @@ systemctl daemon-reload && systemctl restart docker
 curl http://localhost:2375/version
 ```
 
-#### 远程访问（TLS）
+远程访问（TLS）
 
 上述开放远程访问存在极大的安全隐患，没有认证授权，可采用 TLS 认证完善；
 
@@ -228,7 +228,7 @@ docker --tlsverify --tlscacert=/etc/docker/ca.pem   --tlscert=/etc/docker/cert.p
 
 > 注意服务 IP 填写自己对应的主机 IP。
 
-## Hello World
+## 4 Hello World
 
 ```bash
 docker run hello-world
@@ -266,7 +266,7 @@ For more examples and ideas, visit:
  https://docs.docker.com/get-started/
 ```
 
-## 常用命令
+## 5 常用命令
 
 > 参考：[Docker 命令大全](https://www.runoob.com/docker/docker-command-manual.html)
 
@@ -282,7 +282,7 @@ docker exec -it centos /bin/bash
 
 进入一个 name 为 centos 的容器，并且跳转到该容器 bash 终端。
 
-### 可选项
+### 5.1 可选项
 
 1. -i
 
@@ -304,7 +304,7 @@ docker exec -it centos /bin/bash
 
    端口映射，`主机端口:容器端口`；
 
-### 容器
+### 5.2 容器
 
 1. ps
 
@@ -330,7 +330,7 @@ docker exec -it centos /bin/bash
 
    获取容器内的日志；
 
-### 镜像
+### 5.3 镜像
 
 1. images
 
@@ -342,9 +342,7 @@ docker exec -it centos /bin/bash
 
 > 部分 \<none\>:\<none\> 的镜像没有任何引用，可以通过 docker rmi $(docker images -f "dangling=true" -q) 清除。
 
-## 实践
-
-### 时间同步
+## 6 实践
 
 通常宿主机和 docker 容器机器时间不一致，可采取外部挂载解决；
 
@@ -352,9 +350,9 @@ docker exec -it centos /bin/bash
 -v /etc/localtime:/etc/localtime:ro
 ```
 
-### MySQL 安装
+### 6.1 MySQL 安装
 
-#### 安装
+安装
 
 创建一个 mysql 容器，映射本机端口 3306 至容器，并初始化密码为 123456；
 
@@ -362,7 +360,7 @@ docker exec -it centos /bin/bash
 docker run -d --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 mysql
 ```
 
-#### 数据持久化
+数据持久化
 
 每次重新创建 mysql 容器相关数据会被初始化，可以通过 -v 指定挂载路径；
 
@@ -370,7 +368,7 @@ docker run -d --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 mysql
 docker run -d --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 -v /docker/mysql/data:/var/lib/mysql mysql
 ```
 
-#### 添加远程用户
+添加远程用户
 
 进入 mysql 容器 bash 终端交互；
 
@@ -392,9 +390,9 @@ grant all privileges on *.* to 'caojiantao'@'%' with grant option;
 flush privileges;
 ```
 
-### SpringBoot 部署（Idea）
+### 6.2 SpringBoot 部署（Idea）
 
-#### Docker 连接
+Docker 连接
 
 ![](https://p.pstatp.com/origin/138630000e873c1aba09d)
 
@@ -402,7 +400,7 @@ flush privileges;
 
 ![](https://p.pstatp.com/origin/138d00000e9de52574b48)
 
-#### Dockerfile
+Dockerfile
 
 新建 Dockerfile 文件，用来构建镜像，放在项目的根目录；
 
@@ -413,13 +411,13 @@ EXPOSE 8080
 ENTRYPOINT [ "java", "-jar", "app.jar" ]
 ```
 
-#### 镜像部署
+镜像部署
 
 增加镜像部署配置，注意最底部 Maven 命令，clean package -DskipTests，用来生成构建镜像需要的 jar 包；
 
 ![](https://p.pstatp.com/origin/1377200031297b8ac33a5)
 
-#### 外部挂载
+外部挂载
 
 通常需要挂载“项目配置”、“静态资源”和“服务日志”几个目录，通过 idea 也能很方便的操作，通过上图中的`Bind mounts`设置；
 
