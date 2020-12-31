@@ -330,6 +330,7 @@ geo 为地理位置类型，3.2+ 版本才开始支持，其底层实现仍是 z
 | Set(集合)            | 哈希表实现,元素不重复                                  | 1、添加、删除,查找的复杂度都是O(1) 2、为集合提供了求交集、并集、差集等操作 | 1、共同好友 2、利用唯一性,统计访问网站的所有独立ip 3、好友推荐时,根据tag求交集,大于某个阈值就可以推荐 |
 | Sorted Set(有序集合) | 将Set中的元素增加一个权重参数score,元素按score有序排列 | 数据插入集合时,已经进行天然排序                              | 1、排行榜                                                    |
 | geo                  | 经纬度坐标类型                                         |                                                              | 附近的人                                                     |
+
 ## 5 特性
 
 ### 5.1 事务
@@ -719,6 +720,102 @@ public class RedisConfig {
     }
 }
 ```
+
+#### 8.2.5 结合 Spring Cache
+
+spring 的 cache 模块可以很方便引入 redis，从而减少编码提高效率。
+
+首先需要设置 CacheManager，引入 Redis 缓存配置（cacheName、keyPrefix 以及 entryTtL）；
+
+```java
+package cn.caojiantao.study.springbootredis.config;
+
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.cache.RedisCacheWriter;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
+
+import java.time.Duration;
+
+@EnableCaching
+@Configuration
+public class CacheConfig {
+
+    @Bean
+    public CacheManager cacheManager(RedisConnectionFactory factory) {
+        GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer();
+
+        RedisCacheConfiguration defaultCache = RedisCacheConfiguration.defaultCacheConfig()
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(serializer))
+                .entryTtl(Duration.ofMinutes(30));
+
+        RedisCacheWriter writer = RedisCacheWriter.lockingRedisCacheWriter(factory);
+        return RedisCacheManager.RedisCacheManagerBuilder
+                .fromCacheWriter(writer)
+                .withCacheConfiguration("springboot-redis", defaultCache)
+                .build();
+    }
+}
+```
+
+> 注意这里 value 序列化方式为 Generic，会把 class 信息序列化至 json 中，这样好处是不用在反序列化时手动指定 class，坏处则是会增加序列化后的字符串长度。
+
+以用户查询 service 示例；
+
+```java
+package cn.caojiantao.study.springbootredis.service.impl;
+
+import cn.caojiantao.study.springbootredis.entity.Addr;
+import cn.caojiantao.study.springbootredis.entity.User;
+import cn.caojiantao.study.springbootredis.service.IUserService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Slf4j
+@Service
+public class UserServiceImpl implements IUserService {
+
+    private static List<User> userList = new ArrayList<>();
+
+    static {
+        Addr m = new Addr(1, 1, "湖北武汉");
+        User a = new User(1, "曹建涛", m);
+        userList.add(a);
+        Addr n = new Addr(2, 2, "北京海淀");
+        User b = new User(2, "张大仙", n);
+        userList.add(b);
+    }
+
+    @Cacheable(cacheNames = "springboot-redis")
+    @Override
+    public User getById(Integer id) {
+        User user = userList.stream().filter(item -> item.getId().equals(id)).findFirst().orElse(null);
+        log.info("act=getById id={} result={}", id, user);
+        return user;
+    }
+
+    @Cacheable(cacheNames = "springboot-redis")
+    @Override
+    public List<User> getByIdList(List<Integer> idList) {
+        List<User> list = userList.stream().filter(item -> idList.contains(item.getId())).collect(Collectors.toList());
+        log.info("act=getByIdList id={} result={}", idList, list);
+        return list;
+    }
+}
+```
+
+完整代码请参考：[https://github.com/caojiantao/springboot-redis](https://github.com/caojiantao/springboot-redis)
 
 ## 9 分布式解决方案
 
