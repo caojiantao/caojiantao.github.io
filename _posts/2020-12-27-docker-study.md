@@ -100,20 +100,6 @@ systemctl start docker && systemctl enable docker
 docker version
 ```
 
-镜像加速
-
-运行 bash 命令；
-
-```bash
-curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://f1361db2.m.daocloud.io
-```
-
-然后重启 docker 服务；
-
-```bash
-systemctl daemon-reload && systemctl restart docker
-```
-
 远程访问
 
 修改 docker 服务脚本：
@@ -227,6 +213,19 @@ docker --tlsverify --tlscacert=/etc/docker/ca.pem   --tlscert=/etc/docker/cert.p
 ```
 
 > 注意服务 IP 填写自己对应的主机 IP。
+
+### 3.2 镜像加速
+
+```bash
+sudo mkdir -p /etc/docker
+sudo tee /etc/docker/daemon.json <<-'EOF'
+{
+  "registry-mirrors": ["https://guvhm5mo.mirror.aliyuncs.com"]
+}
+EOF
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+```
 
 ## 4 Hello World
 

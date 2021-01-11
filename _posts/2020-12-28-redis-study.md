@@ -200,9 +200,11 @@ save 60 10000
 # maxmemory-policy noeviction
 ```
 
-1. LRU least recently used 最近使用；
-2. LFU least frequently used 最少使用；
+1. LRU least recently used 最近最久未使用；
+2. LFU least frequently used 最近最少使用；
 3. noeviction 默认淘汰策略，return an error；
+
+> 过期策略：惰性删除 + 定时删除。
 
 ## 4 数据类型
 
