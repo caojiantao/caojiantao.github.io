@@ -118,7 +118,7 @@ MySQL 是一个  Oracle 旗下的关系型数据库，使用 SQL 语言进行增
 
 常见的索引数据结构有 B+ 树、Hash。以最常用的 B+ 树为例；
 
-![](https://p.pstatp.com/origin/137e800019bbe7fa61110)
+![](http://pics.caojiantao.site/bcd4b5074c9eb24e3fe966c8d8e64cbc.png)
 
 按照 B+ 树存储方式可以把索引分为两大类；
 
@@ -207,8 +207,8 @@ InnoDB 加锁方法：
 
 - 对于 UPDATE、DELETE、INSERT 自动加 X 锁；
 - 对于普通 SELECT 不会加任何锁；
-- SELECT ... LOCK IN SHARE MODE 显示加 S 锁；
-- SELECT ... FOR UPDATE 显示加 X 锁；
+- SELECT ... LOCK IN SHARE MODE 显式加 S 锁；
+- SELECT ... FOR UPDATE 显式加 X 锁；
 
 查询当前数据库锁状态；
 
@@ -326,7 +326,7 @@ binlog 是 MySQL 最重要的日志，记录了所有的 DDL 和 DML 语句，�
 
 
 
-![](https://p.pstatp.com/origin/13757000370b7ba136291)
+![](http://pics.caojiantao.site/9d52760955d78d26b9c2946bced19046.png)
 
 
 
@@ -387,3 +387,22 @@ mysqldump -h127.0.0.1 -uroot -p123456 db_test > db.sql
 
    null 会额外占用空间，且 count(xxx) 不会参与统计，若是索引列 is not null 也会失效；
 
+## 14 慢查询
+
+慢查询相关信息；
+
+```sql
+SHOW VARIABLES LIKE '%query%';
+```
+
+- slow_query_log
+
+  慢查询记录开关，默认OFF；
+
+- slow_query_log_file
+
+  慢查询记录文件地址；
+
+- long_query_time
+
+  慢 SQL 执行时间阈值，默认 10 秒；
